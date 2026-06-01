@@ -1,0 +1,21 @@
+# scala-cli / build tooling
+.scala-build/
+.bsp/
+.metals/
+.bloop/
+project/target/
+target/
+
+# compiled output
+*.class
+*.tasty
+*.jar
+
+# editors
+.idea/
+*.iml
+
+# os / logs / env
+.DS_Store
+*.log
+.env
