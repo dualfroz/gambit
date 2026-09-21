@@ -10,6 +10,7 @@ target/
 *.class
 *.tasty
 *.jar
+/gambit
 
 # editors
 .idea/
