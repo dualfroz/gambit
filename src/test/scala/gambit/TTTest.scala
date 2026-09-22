@@ -51,25 +51,27 @@ class TTTest extends munit.FunSuite:
     "rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3"
   )
 
-  test("transposition table does not change the search score") {
+  private def fullWidthSearcher(useTt: Boolean): Searcher =
+    val searcher = new Searcher
+    searcher.useTt = useTt
+    searcher.useNullMove = false
+    searcher.useLmr = false
+    searcher.usePruning = false
+    searcher
+
+  test("transposition table does not change the score of a full-width search") {
     for fen <- positions do
-      val withTt = new Searcher
-      withTt.useTt = true
-      val noTt = new Searcher
-      noTt.useTt = false
       assertEquals(
-        withTt.search(Fen.parse(fen), 5, 0).score,
-        noTt.search(Fen.parse(fen), 5, 0).score,
+        fullWidthSearcher(useTt = true).search(Fen.parse(fen), 5, 0).score,
+        fullWidthSearcher(useTt = false).search(Fen.parse(fen), 5, 0).score,
         fen
       )
   }
 
   test("transposition table reduces the node count") {
     for fen <- positions do
-      val withTt = new Searcher
-      withTt.useTt = true
-      val noTt = new Searcher
-      noTt.useTt = false
+      val withTt = fullWidthSearcher(useTt = true)
+      val noTt = fullWidthSearcher(useTt = false)
       val ttNodes = withTt.search(Fen.parse(fen), 5, 0).nodes
       val plainNodes = noTt.search(Fen.parse(fen), 5, 0).nodes
       assert(ttNodes < plainNodes, s"$fen: expected TT to prune, got $ttNodes vs $plainNodes")

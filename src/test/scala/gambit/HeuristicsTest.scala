@@ -25,22 +25,29 @@ class HeuristicsTest extends munit.FunSuite:
     assert(r.score >= TT.MateBound, s"depth 4 should already see the mate, got ${r.score}")
   }
 
-  test("null-move pruning does not change the search result") {
+  private def nullMoveSearcher(useNullMove: Boolean): Searcher =
+    val searcher = new Searcher
+    searcher.useNullMove = useNullMove
+    searcher.useLmr = false
+    searcher.usePruning = false
+    searcher
+
+  test("null-move pruning does not change the result of an otherwise full-width search") {
     val positions = List(
       "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
       "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1",
       "rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3"
     )
     for fen <- positions do
-      val on = new Searcher; on.useNullMove = true
-      val off = new Searcher; off.useNullMove = false
+      val on = nullMoveSearcher(useNullMove = true)
+      val off = nullMoveSearcher(useNullMove = false)
       assertEquals(on.search(Fen.parse(fen), 5, 0).score, off.search(Fen.parse(fen), 5, 0).score, fen)
   }
 
   test("null-move pruning cuts the node count on a middlegame position") {
     val kiwi = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
-    val on = new Searcher; on.useNullMove = true
-    val off = new Searcher; off.useNullMove = false
+    val on = nullMoveSearcher(useNullMove = true)
+    val off = nullMoveSearcher(useNullMove = false)
     val nOn = on.search(Fen.parse(kiwi), 6, 0).nodes
     val nOff = off.search(Fen.parse(kiwi), 6, 0).nodes
     assert(nOn < nOff, s"expected null move to prune, got $nOn vs $nOff")

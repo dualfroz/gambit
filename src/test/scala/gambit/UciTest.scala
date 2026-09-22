@@ -4,7 +4,7 @@ class UciTest extends munit.FunSuite:
 
   test("uci handshake replies with id and uciok") {
     val out = new Uci().handle("uci")
-    assertEquals(out, List("id name gambit", "id author gambit", "uciok"))
+    assertEquals(out, List("id name gambit", "id author Michal Fox", "uciok"))
   }
 
   test("isready replies readyok") {
